@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Reference copy of the UBRA app — not part of this project.
+    "context-of-ubra/**",
   ]),
 ]);
 
