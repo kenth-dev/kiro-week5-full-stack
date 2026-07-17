@@ -24,7 +24,7 @@ export function Navbar({ isAuthed }: { isAuthed: boolean }) {
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link
             href={isAuthed ? "/passport" : "/"}
-            className="flex items-center gap-2 font-serif text-lg font-700 text-secondary"
+            className="flex items-center gap-2 font-serif text-lg font-bold text-secondary"
           >
             <span className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-secondary-foreground">
               <Stamp className="h-5 w-5" />
