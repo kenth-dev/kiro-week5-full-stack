@@ -18,6 +18,13 @@ is saved to their personal, private passport.
 The product must feel like a *digital travel passport*, not a quiz app or an
 admin dashboard.
 
+It is the **gamified companion to [UBRA](https://www.ubra.shop)** — the live
+Filipino heritage platform (digital museum, shop, auctions, community, and
+donations, "Made with hands, priced with heart."). The Passport is where users
+*play through* the same crafts UBRA showcases, then follow deep links back into
+UBRA to view the artifact in the museum, meet the artisan, or support them in
+the shop. See §6.10 for the connection scope.
+
 ---
 
 ## 2. Goals & Non-Goals
@@ -108,6 +115,8 @@ add meaningful time.
 Shows craft name, region, province, image, short description, cultural
 background, one interesting fact, the associated stamp, and the challenge.
 Content stays concise — no long articles before the challenge.
+Includes outbound UBRA links (**View in the UBRA Museum**, **Support this craft
+on UBRA**) — see §6.10.
 
 ### 6.7 Challenge System
 - One multiple-choice question per craft (3–4 options, one correct).
@@ -121,7 +130,8 @@ On a correct answer, the server:
 1. Verifies the answer.
 2. Upserts `user_progress` (unique on `user_id + craft_id`).
 3. Records the unlock timestamp.
-4. Returns success → client shows a lightweight unlock modal/animation.
+4. Returns success → client shows a lightweight unlock modal/animation with a
+   secondary "See this craft on UBRA →" link (§6.10).
 5. Passport and stats refresh.
 
 ### 6.9 Progress Tracking (derived, not stored)
@@ -129,6 +139,34 @@ On a correct answer, the server:
 - Completed = count of the user's `user_progress` rows.
 - Regions discovered = distinct island groups among completed crafts.
 - Completion % = completed / total × 100.
+
+### 6.10 UBRA Platform Connection (outbound, no shared database)
+
+The Passport links *out* to the live UBRA platform at
+`https://www.ubra.shop`. There is **no shared database or auth** with UBRA in
+the MVP — the connection is presentational and link-based, so it's safe and
+fast to ship.
+
+- **Config:** a single `NEXT_PUBLIC_UBRA_BASE_URL` env var
+  (`https://www.ubra.shop`) so links aren't hard-coded.
+- **Per-craft deep links** on the craft detail page (from the craft's
+  `ubra_url`, or built from the base URL). Every link opens in a new tab with
+  `rel="noopener noreferrer"`:
+  - **View in the UBRA Museum** → the matching exhibit/artifact.
+  - **Support this craft on UBRA** → `/shop`.
+- **After a stamp unlock**, the success modal shows a secondary CTA:
+  "See this craft on UBRA →".
+- **Global footer** links to UBRA's main areas: Museum (`/museum`),
+  Shop (`/shop`), Auctions (`/auction`), Community (`/community`),
+  Donate (`/donation`).
+- **Shared branding:** carry UBRA's tagline "Made with hands, priced with
+  heart." in the footer and use the UBRA name/logo to make the two feel like
+  one family of products.
+- Treat UBRA URLs as external content: never import UBRA data server-side,
+  never send user data to UBRA, and don't assume any UBRA route returns JSON.
+
+> Future (post-MVP): real integration — shared identity, live product/artisan
+> data, and syncing collected stamps into a UBRA profile (see §18).
 
 ---
 
@@ -152,6 +190,7 @@ Simplified to **three tables**. Stamp info lives on `crafts` (1 craft = 1 stamp)
 | `region`, `province`, `island_group` | Luzon / Visayas / Mindanao |
 | `image_url` | craft photo |
 | `interesting_fact` | |
+| `ubra_url` | text, nullable — deep link to this craft on ubra.shop |
 | `stamp_name`, `stamp_image_url` | the collectible stamp |
 | `question` | challenge prompt |
 | `options` (jsonb) | array of 3–4 strings |
@@ -195,7 +234,8 @@ progress.
 
 **Reusable components:** Navbar, MobileNav, CraftCard, CraftGrid, StampCard,
 StampCollection, PassportStats, ProgressBar, ChallengeCard, ChallengeOption,
-UnlockModal, RegionBadge, EmptyState, LoadingSkeleton.
+UnlockModal, RegionBadge, EmptyState, LoadingSkeleton, Footer (with UBRA links
++ tagline), UbraLink (external-link button used on craft detail and unlock modal).
 
 **Navigation**
 - Signed out: Home · Sign In · Start Journey
@@ -244,7 +284,10 @@ messages. Never expose raw DB errors or secrets.
 ## 13. Security
 
 - Never expose the Supabase service-role key. Server-only.
-- Client env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Client env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `NEXT_PUBLIC_UBRA_BASE_URL` (`https://www.ubra.shop`).
+- All outbound UBRA links use `target="_blank"` + `rel="noopener noreferrer"`.
+  No user data is ever sent to UBRA (§6.10).
 - Enable RLS before deploy.
 - Validate challenge answers server-side.
 - Run Supabase security + performance advisors before deployment.
@@ -253,18 +296,20 @@ messages. Never expose raw DB errors or secrets.
 
 ## 14. Seed Content (6 crafts)
 
-Balanced across island groups so the passport feels varied.
+Balanced across island groups and **chosen to match crafts already featured on
+UBRA**, so every stamp can deep-link back to a real UBRA exhibit.
 
 | Craft | Region | Island Group | Type |
 |---|---|---|---|
 | Burnay Pottery | Ilocos | Luzon | Pottery |
-| Ifugao Wood Carving | Cordillera | Luzon | Wood carving |
-| Piña Weaving | Aklan | Visayas | Textile |
-| Hablon Weaving | Iloilo | Visayas | Weaving |
-| T'nalak Cloth | South Cotabato | Mindanao | Textile |
-| Basketry (Tboli/Yakan) | BARMM/Basilan | Mindanao | Basketry |
+| Bulul (Ifugao Rice God) Carving | Ifugao | Luzon | Wood carving |
+| Inabel / Binakol Weaving | Ilocos | Luzon | Textile |
+| Piña Cloth | Aklan | Visayas | Textile |
+| Banig Mat Weaving | Samar | Visayas | Basketry |
+| T'nalak Dream Cloth | South Cotabato | Mindanao | Textile |
 
-Each includes a story, one fact, one 3–4 option challenge, and a stamp.
+Each includes a story, one fact, one 3–4 option challenge, a stamp, and a
+`ubra_url` pointing to its UBRA exhibit.
 
 ---
 
@@ -289,6 +334,7 @@ Each includes a story, one fact, one 3–4 option challenge, and a stamp.
 - [ ] Duplicate stamps cannot be created.
 - [ ] User A cannot view User B's progress; RLS enabled and tested.
 - [ ] Works on mobile and desktop.
+- [ ] Craft detail + footer link out to UBRA (ubra.shop) and open in a new tab.
 - [ ] Deployed to Vercel; GitHub repo public; full live flow works.
 
 ---
