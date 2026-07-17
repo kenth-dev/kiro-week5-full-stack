@@ -13,7 +13,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+      className="w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? "Please wait…" : label}
     </button>
@@ -121,7 +121,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             New here?{" "}
             <Link
               href="/signup"
-              className="font-semibold text-accent underline underline-offset-2"
+              className="font-semibold text-primary underline underline-offset-2"
             >
               Start your journey
             </Link>
@@ -131,7 +131,7 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
             Already have a passport?{" "}
             <Link
               href="/login"
-              className="font-semibold text-accent underline underline-offset-2"
+              className="font-semibold text-primary underline underline-offset-2"
             >
               Sign in
             </Link>

@@ -3,9 +3,9 @@ import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const styles: Record<string, string> = {
-  Luzon: "bg-[#e8d9be] text-[#6b4c2a]",
-  Visayas: "bg-[#d7e3d2] text-[#3f5e39]",
-  Mindanao: "bg-[#e6d3cd] text-[#7a3f2f]",
+  Luzon: "bg-primary/10 text-primary",
+  Visayas: "bg-[#e2edd8] text-[#3d6b2a]",
+  Mindanao: "bg-accent/10 text-accent",
 };
 
 export function RegionBadge({

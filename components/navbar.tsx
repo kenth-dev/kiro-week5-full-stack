@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookMarked, Compass, Home, LogOut, Stamp, User } from "lucide-react";
+import { BookMarked, Compass, LogOut, Stamp, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -19,44 +19,48 @@ export function Navbar({ isAuthed }: { isAuthed: boolean }) {
 
   return (
     <>
-      {/* Top bar */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
+      {/* Desktop + tablet top bar */}
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md backdrop-saturate-150">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link
             href={isAuthed ? "/passport" : "/"}
-            className="flex items-center gap-2 font-serif text-lg font-bold text-secondary"
+            className="flex items-center gap-2.5"
           >
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-secondary-foreground">
-              <Stamp className="h-5 w-5" />
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground">
+              <Stamp className="h-4 w-4" />
             </span>
-            <span className="font-semibold tracking-tight">
+            <span className="text-sm font-bold tracking-tight text-secondary">
               UBRA <span className="text-accent">Passport</span>
             </span>
           </Link>
 
           {isAuthed ? (
-            <div className="flex items-center gap-1">
-              <div className="hidden items-center gap-1 sm:flex">
+            <div className="flex items-center gap-0.5">
+              {/* Desktop nav items */}
+              <div className="hidden items-center gap-0.5 sm:flex">
                 {authedLinks.map(({ href, label, icon: Icon }) => (
                   <Link
                     key={href}
                     href={href}
                     className={cn(
-                      "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                      "relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition-all duration-200",
                       isActive(href)
-                        ? "bg-secondary text-secondary-foreground"
-                        : "text-muted-foreground hover:bg-muted"
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-secondary"
                     )}
                   >
                     <Icon className="h-4 w-4" />
                     {label}
+                    {isActive(href) && (
+                      <span className="absolute bottom-0 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-primary" />
+                    )}
                   </Link>
                 ))}
               </div>
               <form action="/auth/signout" method="post">
                 <button
                   type="submit"
-                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-secondary"
                 >
                   <LogOut className="h-4 w-4" />
                   <span className="hidden sm:inline">Logout</span>
@@ -67,44 +71,44 @@ export function Navbar({ isAuthed }: { isAuthed: boolean }) {
             <div className="flex items-center gap-2">
               <Link
                 href="/login"
-                className="rounded-full px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-muted"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-muted"
               >
-                Sign In
+                Sign in
               </Link>
               <Link
                 href="/signup"
-                className="rounded-full bg-secondary px-4 py-2 text-sm font-semibold text-secondary-foreground transition-colors hover:bg-accent"
+                className="press-effect rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:shadow-md"
               >
-                Start Journey
+                Start journey
               </Link>
             </div>
           )}
         </nav>
       </header>
 
-      {/* Mobile bottom nav (authed only) */}
+      {/* Mobile bottom nav (authed only) — iOS-safe */}
       {isAuthed && (
-        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur sm:hidden">
-          <div className="mx-auto flex max-w-md items-stretch justify-around">
+        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/90 backdrop-blur-lg safe-bottom sm:hidden">
+          <div className="mx-auto grid max-w-md grid-cols-4">
             {authedLinks.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-1 py-2.5 text-xs font-medium transition-colors",
+                  "flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors",
                   isActive(href)
-                    ? "text-secondary"
-                    : "text-muted-foreground hover:text-secondary"
+                    ? "text-primary"
+                    : "text-muted-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className={cn("h-5 w-5", isActive(href) && "scale-110")} />
                 {label}
               </Link>
             ))}
-            <form action="/auth/signout" method="post" className="flex-1">
+            <form action="/auth/signout" method="post" className="contents">
               <button
                 type="submit"
-                className="flex w-full flex-col items-center gap-1 py-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-secondary"
+                className="flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium text-muted-foreground transition-colors"
               >
                 <LogOut className="h-5 w-5" />
                 Logout

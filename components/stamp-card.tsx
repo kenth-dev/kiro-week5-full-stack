@@ -26,63 +26,63 @@ export function StampCard({
   return (
     <div
       className={cn(
-        "flex flex-col items-center rounded-xl border p-4 text-center transition-colors",
+        "group relative flex flex-col items-center p-5 text-center transition-all duration-300",
         unlocked
-          ? "border-accent/40 bg-card shadow-sm"
-          : "border-dashed border-border bg-muted/30"
+          ? "animate-fade-in-up"
+          : "opacity-60"
       )}
     >
-      {/* Circular stamp medallion */}
+      {/* Circular stamp — feels like a real passport ink stamp */}
       <div
         className={cn(
-          "relative grid aspect-square w-24 place-items-center overflow-hidden rounded-full border-2",
-          unlocked
-            ? "border-accent bg-muted"
-            : "border-border bg-muted/50 grayscale"
+          "relative flex aspect-square w-[88px] items-center justify-center overflow-hidden sm:w-[100px]",
+          unlocked ? "stamp-unlocked" : "stamp-locked"
         )}
       >
-        {imageUrl ? (
+        {imageUrl && unlocked ? (
           <Image
             src={imageUrl}
             alt={stampName}
             fill
-            sizes="96px"
-            className={cn("object-cover", !unlocked && "opacity-40")}
+            sizes="100px"
+            className="object-cover rounded-full"
           />
+        ) : unlocked ? (
+          <div className="flex flex-col items-center justify-center gap-0.5">
+            <Stamp className="h-6 w-6 text-[var(--passport-stamp-ink)]" />
+            <span className="text-[8px] font-bold uppercase tracking-widest text-[var(--passport-stamp-ink)]">
+              {islandGroup}
+            </span>
+          </div>
         ) : (
-          <Stamp
-            className={cn(
-              "h-9 w-9",
-              unlocked ? "text-accent" : "text-muted-foreground/50"
-            )}
-          />
+          <div className="flex flex-col items-center justify-center gap-1">
+            <Lock className="h-5 w-5 text-muted-foreground/40" />
+          </div>
         )}
-        {!unlocked && (
-          <span className="absolute inset-0 grid place-items-center bg-background/40">
-            <Lock className="h-6 w-6 text-muted-foreground" />
-          </span>
+
+        {/* Subtle rotation for that "stamped" feel */}
+        {unlocked && (
+          <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-[var(--passport-stamp-ink)]/10 rotate-[-3deg]" />
         )}
       </div>
 
+      {/* Info below the stamp */}
       <h4
         className={cn(
-          "mt-3 font-serif text-sm font-semibold leading-tight",
-          unlocked ? "text-secondary" : "text-muted-foreground"
+          "mt-3 text-sm font-semibold leading-tight",
+          unlocked ? "text-secondary" : "text-muted-foreground/60"
         )}
       >
         {craftName}
       </h4>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        {region} · {islandGroup}
+      <p className="mt-0.5 text-[11px] text-muted-foreground">
+        {region}
       </p>
-      <p
-        className={cn(
-          "mt-2 text-xs font-medium",
-          unlocked ? "text-accent" : "text-muted-foreground/70"
-        )}
-      >
-        {unlocked ? `Unlocked ${formatUnlockDate(unlockedAt!)}` : "Locked"}
-      </p>
+      {unlocked && unlockedAt && (
+        <p className="mt-1.5 text-[10px] font-medium text-accent">
+          {formatUnlockDate(unlockedAt)}
+        </p>
+      )}
     </div>
   );
 }
