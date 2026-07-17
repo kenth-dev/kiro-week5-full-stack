@@ -1,26 +1,159 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* UBRA artisan palette */
+  --background: #fffdf9;
+  --foreground: #2b2b2b;
+  --card: #ffffff;
+  --card-foreground: #2b2b2b;
+  --primary: #c8a97e; /* beige */
+  --primary-foreground: #2b2b2b;
+  --secondary: #5c3a21; /* deep brown */
+  --secondary-foreground: #fffdf9;
+  --muted: #eaddc8; /* cream */
+  --muted-foreground: #5c3a21;
+  --accent: #8b6f47; /* mid brown */
+  --accent-foreground: #fffdf9;
+  --border: #eaddc8;
+  --ring: #c8a97e;
+  --success: #4b7f52;
+  --destructive: #b3452f;
+  --radius: 0.75rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-destructive: var(--destructive);
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-lora), ui-serif, Georgia, serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Warm hero gradient with subtle craft texture */
+  .gradient-hero {
+    background: radial-gradient(
+      circle at 25% 15%,
+      #eaddc8 0%,
+      #dcccae 30%,
+      #c8a97e 60%,
+      #8b6f47 100%
+    );
+  }
+
+  /* Faint woven paper texture overlay */
+  .paper-texture {
+    background-image: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 3px,
+        rgba(92, 58, 33, 0.02) 3px,
+        rgba(92, 58, 33, 0.02) 4px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(92, 58, 33, 0.02) 3px,
+        rgba(92, 58, 33, 0.02) 4px
+      );
+  }
+
+  /* Dashed passport-page border */
+  .passport-border {
+    border: 2px dashed color-mix(in srgb, var(--secondary) 35%, transparent);
+  }
+
+  /* Stamp unlock pop animation */
+  @keyframes stampPop {
+    0% {
+      transform: scale(0.4) rotate(-14deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(1.12) rotate(6deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(-4deg);
+      opacity: 1;
+    }
+  }
+  .animate-stamp-pop {
+    animation: stampPop 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out both;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--muted) 70%, transparent);
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.5),
+      transparent
+    );
+    animation: shimmer 1.5s infinite;
+  }
 }
